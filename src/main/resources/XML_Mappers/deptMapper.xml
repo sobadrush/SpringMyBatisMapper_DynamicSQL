@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- http://limingnihao.iteye.com/blog/781878 -->
+<!-- http://www.cnblogs.com/sin90lzc/archive/2012/06/30/2571175.html -->
+<!-- https://my.oschina.net/wangrikui/blog/510189 -->
+<!-- http://computerdragon.blog.51cto.com/6235984/1399742 -->
+<!-- http://tw.gitbook.net/mybatis/mybatis-dynamic-sql.html -->
+
+<mapper namespace="com.ctbc.mapper.DeptMapper">  <!-- "必須"對應 mapper interface 所在的包 -->
+	
+	<resultMap id="resultMapDept" type="fuckDeptVO">
+		<id property="deptNo" column="deptno"/>
+		<result property="deptName" column="dname"/>
+		<result property="deptLoc" column="loc"/>
+	</resultMap>
+    
+    <sql id="SELECT_FRAG">
+    	SELECT * FROM dept_TB10 
+    </sql>
+    
+    <select id="getDept" resultMap="resultMapDept">  
+       <include refid="SELECT_FRAG"/>
+       <where>
+       	  <if test="deptNoGGG != null">
+       	  	  AND deptno = #{deptNoGGG}
+       	  </if>
+       </where>
+    </select>  
+    
+    <!-- ﹝測試Foreach：通常搭配 IN﹞ -->
+    <!-- collection="deptNoInArr" vs @Param(value = "deptNoGGG") , -->
+    <!-- 若沒寫 @Param ，則參數型態為 ：                           -->
+    <!-- 陣列 → collection="array" -->
+    <!-- List → collection="list" -->
+    <!-- Map  → collection="map的key" -->
+    <!-- 在list和陣列中,index是元素的序号，在map中，index是元素的key -->
+    <!-- 【參考】 : https://my.oschina.net/linuxred/blog/38802 -->
+    <!-- 【參考】 : http://blog.csdn.net/isea533/article/details/21237175 -->
+    <select id="getDeptsInMulitId" resultMap="resultMapDept">
+    	SELECT * FROM dept_TB10 WHERE deptno IN
+    	<foreach item="item" index="index" collection="deptNoInArr" open="(" separator="," close=")">
+    		#{item}
+    	</foreach>
+    </select>
+    
+    <insert id="addDept" parameterType="fuckDeptVO" useGeneratedKeys="true"> <!-- keyProperty="deptNo" -->
+       INSERT INTO dept_TB10 ( dname, loc ) VALUES ( #{deptVOgg.deptName} , #{deptVOgg.deptLoc} )
+    </insert>
+    
+    <update id="updateDept" parameterType="fuckDeptVO">
+    	UPDATE dept_TB10 SET dname=#{deptVOgg.deptName},loc=#{deptVOgg.deptLoc} WHERE deptno=#{deptVOgg.deptNo}
+    </update>
+    
+    <update id="updateDeptUseSetTag" parameterType="fuckDeptVO">
+    	UPDATE dept_TB10 
+    	<set>
+    	   <if test="deptVOgg.deptName != null">dname=#{deptVOgg.deptName},</if>
+    	   <if test="deptVOgg.deptLoc  != null">loc=#{deptVOgg.deptLoc},</if>
+    	</set>  
+    	WHERE deptno=#{deptVOgg.deptNo}   	
+    </update>
+    
+    <delete id="delDept" parameterType="int">
+    	DELETE FROM dept_TB10 WHERE deptno=#{deptNumber}
+    </delete>
+</mapper>  
+
+
+
+
+
+
+

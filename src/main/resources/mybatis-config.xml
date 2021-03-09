@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>    
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">  
+  
+<!-- [使用Log4J show-sql] http://blog.csdn.net/isea533/article/details/22931341 -->
+<!-- [使用Log4J show-sql] http://843977358.iteye.com/blog/2259796 -->
+
+<!-- 不少应用服务器的 classpath 中已经包含Commons Logging，如 Tomcat 和WebShpere， 
+     所以MyBatis会把它作为具体的日志实现。
+     记住这点非常重要。这意味着，在诸如 WebSphere的环境中——WebSphere提供了Commons Logging
+     的私有实现，你的Log4J配置将被忽略。 -->  
+  
+<configuration>  
+    <properties>  
+        <property name="dialect" value="sqlserver" />  <!-- not necessary -->
+    </properties>  
+    <settings>  
+        <setting name="logImpl" value="LOG4J" />   
+    </settings>  
+</configuration> 

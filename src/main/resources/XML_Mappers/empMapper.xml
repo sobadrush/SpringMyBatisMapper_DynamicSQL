@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ctbc.mapper.EmpMapper">
+	
+	<resultMap id="resultMapEmp" type="EmpVOgg">
+		<id property="empNo" column="empno"/>
+		<result property="empName" column="ename"/>
+		<result property="empJob" column="job"/>
+		<result property="empHiredate" column="hiredate"/>
+		<result property="deptNo" column="deptno"/>
+	</resultMap>
+
+	<sql id="select_frag">
+		SELECT * FROM emp_TB10
+	</sql>
+	
+	<select id="getEmp" resultMap="resultMapEmp">
+		<include refid="select_frag"/>
+		<where>
+			<if test="empNoGG != null">
+				AND empno = #{empNoGG}
+			</if>
+		</where>
+	</select>
+	
+	<insert id="addEmp" parameterType="EmpVOgg">
+		INSERT INTO emp_TB10 ( ename, job, hiredate, deptno )
+		VALUES(#{empName},#{empJob},#{empHiredate},#{deptNo})
+	</insert>
+	
+	<update id="updateEmp">
+		UPDATE emp_TB10 SET ename    = #{empNoGG.empName},
+							job      = #{empNoGG.empJob},
+							hiredate = #{empNoGG.empHiredate},
+							deptno   = #{empNoGG.deptNo} 
+		WHERE empno = #{empNoGG.empNo}
+	</update>
+	
+	<delete id="delEmp" parameterType="int">	
+		DELETE FROM emp_TB10 WHERE empno = #{whatever}
+	</delete>
+	
+	<!-- ﹝進階查詢﹞ -->
+	<select id="getEmpByDateInteval" resultMap="resultMapEmp">
+		SELECT * FROM emp_TB10 WHERE hiredate IN
+		<foreach item="data" collection="list" open="(" separator="," close=")">
+			#{data}
+		</foreach>
+	</select>
+	
+	<!-- ﹝進階查詢 - 測試 <choose>...<when>...<otherwise>﹞ -->
+	<select id="getEmpDynamic" resultMap="resultMapEmp">
+		SELECT * FROM emp_TB10
+		<choose>
+			<when test="empId != null">
+				<where>
+					AND empno = #{empId}
+				</where>
+			</when>
+			<when test=" enamePartial != null">
+				<bind name="pattern" value = " '%' + enamePartial + '%' " />
+				<where>
+					<!-- AND ename LIKE '%' + #{enamePartial} + '%' -->
+					AND ename LIKE #{pattern}
+				</where>
+			</when>
+			<when test="hiredates != null">
+				<where>
+					AND hiredate IN 
+					<foreach item="data" collection="hiredates" open="(" separator="," close=")">
+						#{data}
+					</foreach>
+				</where>
+			</when>
+			<otherwise>
+				<!-- do-nothing -->
+			</otherwise>			
+		</choose>
+	</select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
